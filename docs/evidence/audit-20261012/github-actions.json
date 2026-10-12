@@ -1,0 +1,67 @@
+{
+  "run_id": 38293564115,
+  "url": "https://github.com/hundrik3/pSQL-DRL/actions/runs/38293564115",
+  "tested_commit": "0fa1593a29fd4b43f3529e2abae27380446d886f",
+  "status": "completed",
+  "conclusion": "success",
+  "jobs": [
+    {
+      "completedAt": "2026-10-12T18:51:24Z",
+      "conclusion": "success",
+      "databaseId": 114959155395,
+      "name": "recovery",
+      "startedAt": "2026-10-12T18:50:01Z",
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Checkout",
+          "number": 2,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Check runtime",
+          "number": 3,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run isolated disaster recovery exercises",
+          "number": 4,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Upload current run evidence",
+          "number": 5,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Checkout",
+          "number": 10,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 11,
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/hundrik3/pSQL-DRL/actions/runs/38293564115/job/114959155395"
+    }
+  ],
+  "artifact_downloaded_and_inspected": true,
+  "ci_log_downloaded_and_inspected": true,
+  "unit_test_count_verified_from_log": 10,
+  "recovery_scenarios_verified_from_artifact": 3,
+  "additional_checks_verified_from_artifact": 11
+}

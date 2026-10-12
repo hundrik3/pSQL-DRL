@@ -27,6 +27,8 @@ source-volume exercise deliberately loses one unarchived batch.
 See the [requirements audit and new evidence](docs/audit.md),
 [measurement method](docs/measurement.md), and
 [initial exercise report](docs/exercise-report.md). Initial evidence is preserved.
+[Latest successful CI run](https://github.com/hundrik3/pSQL-DRL/actions/runs/38293564115)
+also passed the expanded suite; its artifact and log were downloaded and checked.
 
 ## Architecture
 

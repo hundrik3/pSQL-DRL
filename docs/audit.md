@@ -99,3 +99,26 @@ The same-host backup limitation, one-original-timeline scope, small workload,
 colocated manifest and manual client cutover remain intentional lab limits.
 RTO/RPO observations are not production guarantees. Historic evidence still
 records the initial run; the audit directory describes this expanded version.
+
+## Repeated GitHub Actions validation
+
+[Run 38293564115](https://github.com/hundrik3/pSQL-DRL/actions/runs/38293564115)
+completed successfully for implementation commit
+0fa1593a29fd4b43f3529e2abae27380446d886f. All job steps succeeded. The complete
+hosted artifact and job log were downloaded: the log confirms ten unit tests,
+and the artifact confirms three real scenarios and eleven additional checks.
+The earlier artifact-download restriction no longer prevents verification.
+
+| CI exercise | RTO (seconds) | RPO / rollback gap (seconds) |
+| --- | ---: | ---: |
+| full-backup-restore | 4.739 | 0.000000 |
+| source-volume-loss | 6.212 | 4.361849 |
+| delete-and-pitr | 4.696 | 4.222350 |
+
+These CI measurements use the same method on a separate hosted runner; they are
+not interchangeable with the local host timings or production guarantees.
+[Downloaded CI report](evidence/audit-20261012/ci-report.json) and
+[run/step verification](evidence/audit-20261012/github-actions.json) are preserved.
+
+This final evidence-only update changes documentation, not the tested
+implementation; docs-only updates do not trigger another workflow run.
