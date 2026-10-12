@@ -69,3 +69,25 @@ protect against total computer loss; it provides neither off-host redundancy nor
 independent backup authenticity. See [design decisions](decisions.md) and
 [self-review](review.md). GitHub Actions evidence is recorded separately after
 its actual completion.
+
+## GitHub Actions validation
+
+[Run 38282189905](https://github.com/hundrik3/pSQL-DRL/actions/runs/38282189905)
+completed successfully for commit 00aa69dbcfd16207316ad41740432dbec54b0e70.
+The runtime check, full fault suite, evidence upload and cleanup steps all
+completed successfully. [Saved API evidence](evidence/github-actions.json) records
+every step conclusion and artifact metadata. The workflow uses immutable Node.js
+24 action commits; a prior Node.js deprecation annotation was resolved.
+
+Raw hosted logs/artifact contents were not downloaded: the cloud egress policy
+denied the Actions log host. This does not prevent API outcome verification or
+access to the artifact in GitHub's UI. That destination has been saved in the
+environment configuration draft for review; no hosted artifact RTO/RPO values
+are claimed here. The detailed measurements above come from the actual local run.
+
+An additional real foreground scheduler probe completed two interval-triggered
+backup attempts with exit code 0, then was deliberately stopped with SIGINT.
+[Timed scheduler evidence](evidence/scheduler-loop.json) records both attempts.
+
+This documentation-only evidence update does not trigger another CI run: the
+workflow ignores docs and README changes. The tested implementation is unchanged.

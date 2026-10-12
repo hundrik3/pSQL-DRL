@@ -1,0 +1,74 @@
+{
+  "run_id": 38282189905,
+  "url": "https://github.com/hundrik3/pSQL-DRL/actions/runs/38282189905",
+  "tested_commit": "00aa69dbcfd16207316ad41740432dbec54b0e70",
+  "status": "completed",
+  "conclusion": "success",
+  "jobs": [
+    {
+      "completedAt": "2026-10-12T17:10:11Z",
+      "conclusion": "success",
+      "databaseId": 114921873545,
+      "name": "recovery",
+      "startedAt": "2026-10-12T17:08:10Z",
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Checkout",
+          "number": 2,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Check runtime",
+          "number": 3,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run isolated disaster recovery exercises",
+          "number": 4,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Upload current run evidence",
+          "number": 5,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Checkout",
+          "number": 10,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 11,
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/hundrik3/pSQL-DRL/actions/runs/38282189905/job/114921873545"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": 11760909737,
+      "name": "recovery-evidence-38282189905",
+      "size_in_bytes": 4747,
+      "expired": false,
+      "expires_at": "2026-10-19T17:10:08Z"
+    }
+  ],
+  "verification": "Run, job and every step conclusion checked through the GitHub API.",
+  "artifact_contents_downloaded": false,
+  "download_limit": "Cloud egress denied results-receiver.actions.githubusercontent.com; required domain saved in the environment draft. Artifact metadata verified; raw hosted logs and artifact contents were not inspected."
+}

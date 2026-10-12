@@ -1,0 +1,20 @@
+{
+  "status": "passed",
+  "interval_seconds": 1,
+  "completed_attempts": 2,
+  "records": [
+    {
+      "time": "2026-10-12T17:11:17.356881+00:00",
+      "exit_code": 0,
+      "stdout": "20261012T171048Z-d967652a\n",
+      "stderr": ""
+    },
+    {
+      "time": "2026-10-12T17:11:46.289373+00:00",
+      "exit_code": 0,
+      "stdout": "20261012T171118Z-bb1bbdd6\n",
+      "stderr": ""
+    }
+  ],
+  "termination": "SIGINT after two completed attempts"
+}

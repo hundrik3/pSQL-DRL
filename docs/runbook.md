@@ -75,7 +75,7 @@ even when a check fails; logs and JSON reports remain under results/.
 
 ## Schedule and detect failures
 
-Foreground local loop, one backup per hour (stop with Ctrl-C):
+Foreground local loop, wait one hour between completed attempts (stop with Ctrl-C):
 
     make schedule INTERVAL=3600
 
@@ -86,6 +86,7 @@ One-shot entry point for cron:
 Example crontab; replace the path with your clone path and use an absolute Python
 path if your cron PATH lacks python3:
 
+    PATH=/usr/local/bin:/usr/bin:/bin
     0 * * * * cd /path/to/pSQL-DRL && /usr/bin/python3 scripts/lab.py schedule --once >> /path/to/pSQL-DRL/results/cron.log 2>&1
 
 Do not run both a cron entry and a foreground scheduler for the same instance.

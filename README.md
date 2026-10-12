@@ -23,6 +23,8 @@ checks. The source named volume was actually removed before its recovery.
 PITR intentionally omits the later batch; its gap is a rollback window. The
 source-volume exercise deliberately loses one unarchived batch.
 Full evidence and definitions: [exercise report](docs/exercise-report.md).
+[Successful GitHub Actions integration run](https://github.com/hundrik3/pSQL-DRL/actions/runs/38282189905)
+used the same complete fault suite with pinned Node.js 24 Actions.
 
 ## Architecture
 
