@@ -56,3 +56,9 @@ Generated backup data, WAL, volume content, credentials and bulky test outputs a
 ignored. Only selected small, reviewed evidence is copied into docs/evidence/.
 Failed intermediate development runs remain local and are not presented as
 successful portfolio results.
+
+## Follow-up audit
+
+The [requirements audit](audit.md) records subsequently reproduced edge cases,
+their corrections, ten regression gates and the expanded real Docker suite.
+The initial report is historical evidence; it does not cover these new failure paths.

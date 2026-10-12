@@ -1,4 +1,4 @@
-.PHONY: up seed backup verify check archive restore pitr test schedule schedule-once status down clean
+.PHONY: up seed backup verify check archive restore pitr test test-unit schedule schedule-once status down clean
 PYTHON ?= python3
 LAB = $(PYTHON) scripts/lab.py
 up:
@@ -17,7 +17,9 @@ restore:
 	$(LAB) restore $(if $(BACKUP),--backup $(BACKUP))
 pitr:
 	$(LAB) restore --target "$(TARGET)" $(if $(BACKUP),--backup $(BACKUP))
-test:
+test-unit:
+	$(PYTHON) -m unittest discover -s tests -v
+test: test-unit
 	$(LAB) test
 schedule:
 	$(LAB) schedule --interval $(or $(INTERVAL),3600)

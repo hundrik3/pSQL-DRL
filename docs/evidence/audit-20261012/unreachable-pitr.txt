@@ -1,0 +1,28 @@
+Database exited during startup
+recovery-1  |
+recovery-1  | PostgreSQL Database directory appears to contain a database; Skipping initialization
+recovery-1  |
+recovery-1  | 2026-10-12 18:38:39.628 UTC [1] LOG:  starting PostgreSQL 17.11 (Debian 17.11-1.pgdg12+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+recovery-1  | 2026-10-12 18:38:39.628 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+recovery-1  | 2026-10-12 18:38:39.628 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+recovery-1  | 2026-10-12 18:38:39.633 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+recovery-1  | 2026-10-12 18:38:39.635 UTC [29] LOG:  database system was interrupted; last known up at 2026-10-12 18:37:35 UTC
+recovery-1  | 2026-10-12 18:38:40.136 UTC [29] LOG:  starting backup recovery with redo LSN 0/3000028, checkpoint LSN 0/3000080, on timeline ID 1
+recovery-1  | 2026-10-12 18:38:40.140 UTC [44] FATAL:  the database system is starting up
+recovery-1  | 2026-10-12 18:38:40.141 UTC [29] LOG:  restored log file "000000010000000000000003" from archive
+recovery-1  | 2026-10-12 18:38:40.152 UTC [29] LOG:  starting point-in-time recovery to 2026-10-13 18:38:23.964239+00
+recovery-1  | 2026-10-12 18:38:40.153 UTC [29] LOG:  redo starts at 0/3000028
+recovery-1  | 2026-10-12 18:38:40.157 UTC [29] LOG:  restored log file "000000010000000000000004" from archive
+recovery-1  | 2026-10-12 18:38:40.167 UTC [29] LOG:  restored log file "000000010000000000000005" from archive
+recovery-1  | 2026-10-12 18:38:40.173 UTC [29] LOG:  completed backup recovery with redo LSN 0/3000028 and end LSN 0/3000120
+recovery-1  | 2026-10-12 18:38:40.173 UTC [29] LOG:  consistent recovery state reached at 0/3000120
+recovery-1  | 2026-10-12 18:38:40.174 UTC [1] LOG:  database system is ready to accept read-only connections
+recovery-1  | cp: cannot stat '/repository/wal/000000010000000000000006': No such file or directory
+recovery-1  | cp: cannot stat '/repository/wal/000000010000000000000006': No such file or directory
+recovery-1  | 2026-10-12 18:38:40.178 UTC [29] LOG:  redo done at 0/50593F0 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.02 s
+recovery-1  | 2026-10-12 18:38:40.178 UTC [29] LOG:  last completed transaction was at log time 2026-10-12 18:37:58.172399+00
+recovery-1  | 2026-10-12 18:38:40.178 UTC [29] FATAL:  recovery ended before configured recovery target was reached
+recovery-1  | 2026-10-12 18:38:40.179 UTC [1] LOG:  startup process (PID 29) exited with exit code 1
+recovery-1  | 2026-10-12 18:38:40.179 UTC [1] LOG:  terminating any other active server processes
+recovery-1  | 2026-10-12 18:38:40.179 UTC [1] LOG:  shutting down due to startup process failure
+recovery-1  | 2026-10-12 18:38:40.180 UTC [1] LOG:  database system is shut down

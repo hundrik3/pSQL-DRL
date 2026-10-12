@@ -1,0 +1,2 @@
+{"time": "2026-10-12T18:41:33.938761+00:00", "exit_code": 0, "stdout": "20261012T184059139668Z-90551afb\n", "stderr": ""}
+{"time": "2026-10-12T18:41:34.467379+00:00", "exit_code": 1, "stdout": "", "stderr": "Command failed (1): docker exec -i -u postgres 687f173e78fdfb88f121711fc48123335db54fa8f973867c4d72050002c16f67 psql -X -q -A -t -v ON_ERROR_STOP=1 -U postgres -d shop\nError response from daemon: container 687f173e78fdfb88f121711fc48123335db54fa8f973867c4d72050002c16f67 is not running\n\n"}

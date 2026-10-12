@@ -13,7 +13,9 @@ digest pinning prevents silent updates, but also prevents automatic security fix
 The database uses data-page checksums. A full backup uses
 pg_basebackup -Fp -X stream --checkpoint=fast --manifest-checksums=SHA256.
 The streamed WAL makes the base backup independently consistent. A hidden partial
-directory becomes selectable only after pg_verifybackup succeeds. No running
+directory becomes selectable only after pg_verifybackup succeeds and the WAL
+archive durability barrier is confirmed. A failed barrier leaves an ignored
+partial instead of changing the latest selectable backup. No running
 database files are copied as a substitute for an online backup.
 
 The manifest is stored alongside its backup. This detects accidental corruption
@@ -49,6 +51,10 @@ segment of the oldest retained backup. Keep backup/timeline history files.
 Retention runs after successful backup and archive-barrier checks; failed
 scheduled attempts do not expire valid backups. Partial failed backups are not
 selectable and remain for investigation until cleanup (they can consume disk).
+New backup IDs contain microseconds. Sorting parses their timestamps and accepts
+legacy second-resolution IDs; a random suffix does not define the order of new
+backups created within one second. This remains a wall-clock-based lab policy,
+not a catalog designed for clocks moving backwards.
 
 This lab supports one source cluster and original timeline 1. A restored server
 promotes onto a new timeline with archiving disabled. It is a validation target,
@@ -81,6 +87,8 @@ The repository is bound to PostgreSQL's system identifier as well as the lab UUI
 Reinitializing a source with the same lab UUID cannot silently mix an unrelated
 cluster's backups or WAL into the existing repository. Startup waits for the final
 PID-1 PostgreSQL process, not the image's temporary initialization server.
+If the source volume is missing while its bound repository remains, startup
+refuses before creating another source. Use restore to recover into a new target.
 
 A random password is generated in .local/db_password, mode 0600, and mounted as a
 Compose secret. No password is put in Compose, Git, command arguments or reports.

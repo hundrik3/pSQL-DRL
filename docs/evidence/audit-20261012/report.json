@@ -1,0 +1,246 @@
+{
+  "started_at": "2026-10-12T18:35:25.251536+00:00",
+  "image": "postgres:17.11-bookworm@sha256:3645570cccdfa447589da9f57dd740faa29b30938e861289a5574b6ca6b03826",
+  "project": "psqldrl_5a7e5de514ec413199c72a00752081e8",
+  "scenarios": [
+    {
+      "scenario": "full-backup-restore",
+      "status": "passed",
+      "rto_seconds": 20.505,
+      "rpo_seconds": 0,
+      "missing_acknowledged_batches": [],
+      "lost_orders": 0,
+      "intentional_rollback_batches": [],
+      "acknowledged_commits": [
+        {
+          "id": 1,
+          "committed_at": "2026-10-12T18:35:43.532343+00:00"
+        }
+      ],
+      "recovered_commits": [
+        {
+          "id": 1,
+          "committed_at": "2026-10-12T18:35:43.532343+00:00"
+        }
+      ],
+      "integrity": {
+        "customers": {
+          "rows": 20,
+          "sha256": "8c51639e1c64fe627a50fcfe5cde50c50c424cd1c282cabbd9340503edcf4a8d"
+        },
+        "products": {
+          "rows": 10,
+          "sha256": "c0d85b192a13681d010df0b347d2ed17e990cdb7f8c0cf07c10f6346c83b6ddf"
+        },
+        "batches": {
+          "rows": 1,
+          "sha256": "2a0f837c83760636916a716c22415b24d35773fb326c724b66eb1eb3cb2b07c0"
+        },
+        "orders": {
+          "rows": 25,
+          "sha256": "6496400b8dc6ca8dcf61336e333da318febad7fc7157aeb070a4d7349d8ca1d9"
+        },
+        "order_items": {
+          "rows": 25,
+          "sha256": "12d47e8b74d3ee9fe70eec5c5a3f15d2a57f1c64c2d3eaa3d442bb0d541351c7"
+        },
+        "constraints_sha256": "6e63b51ff9c101add906a08f2de50159dcc99bee3f543927a39452f7edf8f955"
+      }
+    },
+    {
+      "scenario": "source-volume-loss",
+      "status": "passed",
+      "rto_seconds": 29.123,
+      "rpo_seconds": 13.373168,
+      "missing_acknowledged_batches": [
+        3
+      ],
+      "lost_orders": 25,
+      "intentional_rollback_batches": [],
+      "acknowledged_commits": [
+        {
+          "id": 1,
+          "committed_at": "2026-10-12T18:35:43.532343+00:00"
+        },
+        {
+          "id": 2,
+          "committed_at": "2026-10-12T18:36:25.483135+00:00"
+        },
+        {
+          "id": 3,
+          "committed_at": "2026-10-12T18:36:38.856303+00:00"
+        }
+      ],
+      "recovered_commits": [
+        {
+          "id": 1,
+          "committed_at": "2026-10-12T18:35:43.532343+00:00"
+        },
+        {
+          "id": 2,
+          "committed_at": "2026-10-12T18:36:25.483135+00:00"
+        }
+      ],
+      "integrity": {
+        "customers": {
+          "rows": 20,
+          "sha256": "8c51639e1c64fe627a50fcfe5cde50c50c424cd1c282cabbd9340503edcf4a8d"
+        },
+        "products": {
+          "rows": 10,
+          "sha256": "c0d85b192a13681d010df0b347d2ed17e990cdb7f8c0cf07c10f6346c83b6ddf"
+        },
+        "batches": {
+          "rows": 2,
+          "sha256": "6a176f26d3370995e4cc3411f3d879b3eb9d351d8919591da1d067df59de8dcf"
+        },
+        "orders": {
+          "rows": 50,
+          "sha256": "5e395639f7511814797587520d5cf3a906daca647d0b8639e8908aaaffc613a9"
+        },
+        "order_items": {
+          "rows": 50,
+          "sha256": "dd226149158a96150c4b316b2a684a37cb2b4ba223781de9b6afb32339f6ad72"
+        },
+        "constraints_sha256": "6e63b51ff9c101add906a08f2de50159dcc99bee3f543927a39452f7edf8f955"
+      },
+      "last_archived_segment": "000000010000000000000005",
+      "source_volume_absent": true,
+      "archived_batch_count": 2
+    },
+    {
+      "scenario": "delete-and-pitr",
+      "status": "passed",
+      "rto_seconds": 21.848,
+      "rpo_seconds": 9.7656,
+      "missing_acknowledged_batches": [
+        3
+      ],
+      "lost_orders": 25,
+      "intentional_rollback_batches": [
+        3
+      ],
+      "acknowledged_commits": [
+        {
+          "id": 1,
+          "committed_at": "2026-10-12T18:37:31.572715+00:00"
+        },
+        {
+          "id": 2,
+          "committed_at": "2026-10-12T18:37:48.406799+00:00"
+        },
+        {
+          "id": 3,
+          "committed_at": "2026-10-12T18:37:58.172399+00:00"
+        }
+      ],
+      "recovered_commits": [
+        {
+          "id": 1,
+          "committed_at": "2026-10-12T18:37:31.572715+00:00"
+        },
+        {
+          "id": 2,
+          "committed_at": "2026-10-12T18:37:48.406799+00:00"
+        }
+      ],
+      "integrity": {
+        "customers": {
+          "rows": 20,
+          "sha256": "8c51639e1c64fe627a50fcfe5cde50c50c424cd1c282cabbd9340503edcf4a8d"
+        },
+        "products": {
+          "rows": 10,
+          "sha256": "c0d85b192a13681d010df0b347d2ed17e990cdb7f8c0cf07c10f6346c83b6ddf"
+        },
+        "batches": {
+          "rows": 2,
+          "sha256": "804e01878207a9c63d304f1209391aec5e84305a9ac34ccee7cec4daa694ef31"
+        },
+        "orders": {
+          "rows": 50,
+          "sha256": "5e395639f7511814797587520d5cf3a906daca647d0b8639e8908aaaffc613a9"
+        },
+        "order_items": {
+          "rows": 50,
+          "sha256": "dd226149158a96150c4b316b2a684a37cb2b4ba223781de9b6afb32339f6ad72"
+        },
+        "constraints_sha256": "6e63b51ff9c101add906a08f2de50159dcc99bee3f543927a39452f7edf8f955"
+      },
+      "target_time": "2026-10-12 18:37:53.886004+00",
+      "orders_after_fault": 25,
+      "orders_after_recovery": 50,
+      "expected_commits_before_delete": [
+        {
+          "id": 1,
+          "committed_at": "2026-10-12T18:37:31.572715+00:00"
+        },
+        {
+          "id": 2,
+          "committed_at": "2026-10-12T18:37:48.406799+00:00"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "name": "missing-source-startup-refused",
+      "status": "passed"
+    },
+    {
+      "name": "unreachable-pitr-refused",
+      "status": "passed"
+    },
+    {
+      "name": "archive-idempotency-and-no-overwrite",
+      "status": "passed"
+    },
+    {
+      "name": "corrupt-data",
+      "status": "passed",
+      "verifier_exit_code": 1,
+      "diagnostic": "pg_verifybackup: error: /repository/failed/corrupt-data/global/pg_control: CRC is incorrect"
+    },
+    {
+      "name": "missing-data",
+      "status": "passed",
+      "verifier_exit_code": 1,
+      "diagnostic": "pg_verifybackup: error: \"global/pg_control\" is present in the manifest but not on disk"
+    },
+    {
+      "name": "missing-wal",
+      "status": "passed",
+      "verifier_exit_code": 1,
+      "diagnostic": "pg_waldump: error: could not find any WAL file\npg_verifybackup: error: WAL parsing failed for timeline 1"
+    },
+    {
+      "name": "archive-barrier-failure-unpublished",
+      "status": "passed",
+      "fault_injection": "Controller barrier outage after real physical backup and verification"
+    },
+    {
+      "name": "retention-and-oldest-restore",
+      "status": "passed",
+      "retained_full_backups": 2,
+      "post_backup_batch_replayed": 4,
+      "expired_wal_segments_removed": true
+    },
+    {
+      "name": "scheduled-backup-and-failure",
+      "status": "passed",
+      "success_exit_code": 0,
+      "failure_exit_code": 1
+    },
+    {
+      "name": "foreign-resource-refused",
+      "status": "passed",
+      "fixture_volume_preserved_on_refusal": true
+    },
+    {
+      "name": "resource-cleanup",
+      "status": "passed"
+    }
+  ],
+  "status": "passed",
+  "finished_at": "2026-10-12T18:41:45.431129+00:00"
+}

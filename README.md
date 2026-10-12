@@ -11,20 +11,22 @@ storage, host PostgreSQL installation or Python dependency installation is neede
 
 ## Confirmed local results
 
-A complete run on 2026-10-12 passed all three recovery exercises and six additional
-checks. The source named volume was actually removed before its recovery.
+A follow-up audit on 2026-10-12 found and fixed backup-publication and failure-path
+edge cases. Ten regression tests, three real recovery scenarios and eleven
+additional checks passed. The original source volume was actually removed
+before its recovery.
 
-| Exercise | RTO (seconds) | Observed RPO / rollback gap (seconds) | Omitted acknowledged orders |
-| --- | ---: | ---: | --- |
-| full-backup-restore | 20.650 | 0.000000 | 0 |
-| source-volume-loss | 25.763 | 12.492706 | 25 |
-| delete-and-pitr | 18.714 | 9.113017 | 25 intentionally omitted |
+| Exercise | RTO (seconds) | Observed RPO / rollback gap (seconds) | Omitted orders |
+| --- | ---: | ---: | ---: |
+| full-backup-restore | 20.505 | 0.000000 | 0 |
+| source-volume-loss | 29.123 | 13.373168 | 25 |
+| delete-and-pitr | 21.848 | 9.765600 | 25 intentionally omitted |
 
 PITR intentionally omits the later batch; its gap is a rollback window. The
 source-volume exercise deliberately loses one unarchived batch.
-Full evidence and definitions: [exercise report](docs/exercise-report.md).
-[Successful GitHub Actions integration run](https://github.com/hundrik3/pSQL-DRL/actions/runs/38282189905)
-used the same complete fault suite with pinned Node.js 24 Actions.
+See the [requirements audit and new evidence](docs/audit.md),
+[measurement method](docs/measurement.md), and
+[initial exercise report](docs/exercise-report.md). Initial evidence is preserved.
 
 ## Architecture
 

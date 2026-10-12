@@ -1,0 +1,17 @@
+{
+  "checked_at_utc": "2026-10-12T18:41:45.431129+00:00",
+  "python": "3.12.14",
+  "implementation_sha256": {
+    "scripts/lab.py": "7e8a4fb478539890e63f891ba0dbb4d4541bb07e3c08170675a88b4a9a166146",
+    "postgres/archive.sh": "caf6daf502ad82fbfc34728dcc0362dccc0df3a80d16410688c909db56569bc7",
+    "postgres/schema.sql": "4639a4cee32033bee7fb0108b3883a7f08e016e662b20346a4ba7ccefc9c63b3",
+    "compose.yaml": "c412f8a6d3824e5e257ede85ab4fc84ed75e3978d769ee29bf2aab21ce51d1ee",
+    "tests/test_controller.py": "95aa98ff3666bdec0766a568425b4f770128a3e06e63d734168d01dd09f0fcef",
+    "Makefile": "a6bbd3c8b77874da69dfd5aeff307a64d3ccb295a69c317c12b8f05441836939"
+  },
+  "local_regression_tests": 10,
+  "real_recovery_scenarios": 3,
+  "real_additional_checks": 11,
+  "interactive_lab_preserved": "Existing source restarted; 25 orders and original content hashes preserved; legacy backup still verified.",
+  "prior_ci_artifact_inspection": "Downloaded run 38282189905; its original report has status passed with 3 scenarios and 6 checks. Initial network limitation no longer prevents artifact access."
+}

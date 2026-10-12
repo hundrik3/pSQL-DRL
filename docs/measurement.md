@@ -60,8 +60,14 @@ make test uses a new project on every invocation, writes results/<project>/repor
 backup/scheduler JSONL records and concise failure/PITR logs. Reports record a
 top-level passed or failed status; checks that have not run are not listed as
 successful. An expected verifier/scheduler failure is a passed negative test only
-if the underlying command actually returns nonzero. The source is restarted and
+if the underlying command actually returns the expected failure. Corruption
+checks require pg_verifybackup's own matching diagnostic and exit status, not a
+generic Docker error. The source is restarted and
 the good backup is rechecked after the scheduler-failure exercise.
+The final report is written after resource cleanup. Cleanup errors mark the run
+failed and are recorded separately from any preceding exercise error.
+make test also runs ten standard-library regression tests before the Docker
+exercises; mocked safety/error-path tests are distinct from actual restore checks.
 
 The tracked evidence is a selected completed run under docs/evidence/, not live
 backup data. New runs remain ignored; review and explicitly copy only small,

@@ -1,0 +1,11 @@
+{
+  "failed_barrier_published_backup": true,
+  "before": [
+    "20261012T183241Z-0bcb33a3"
+  ],
+  "after": [
+    "20261012T183241Z-0bcb33a3",
+    "20261012T183253Z-467c403d"
+  ],
+  "fault": "Controller barrier failure injected after a real pg_basebackup and pg_verifybackup"
+}

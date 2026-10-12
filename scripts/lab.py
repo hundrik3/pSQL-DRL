@@ -13,11 +13,28 @@ import subprocess
 import sys
 import time
 import uuid
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 LOCAL = ROOT / ".local"
 IMAGE = "postgres:17.11-bookworm@sha256:3645570cccdfa447589da9f57dd740faa29b30938e861289a5574b6ca6b03826"
-BACKUP_PATTERN = r"[0-9]{8}T[0-9]{6}Z-[a-f0-9]{8}"
+BACKUP_PATTERN = r"[0-9]{8}T[0-9]{6}(?:[0-9]{6})?Z-[a-f0-9]{8}"
+
+def backup_sort_key(identifier):
+    timestamp = identifier.split("-", 1)[0]
+    # Preserve second-resolution IDs from earlier runs alongside new microsecond IDs.
+    fmt = "%Y%m%dT%H%M%S%fZ" if len(timestamp) == 22 else "%Y%m%dT%H%M%SZ"
+    return dt.datetime.strptime(timestamp, fmt), identifier
+
+def require_verifier_rejection(mode, result):
+    expected = {
+        "corrupt-data": "CRC is incorrect",
+        "missing-data": '"global/pg_control" is present in the manifest but not on disk',
+        "missing-wal": "WAL parsing failed for timeline 1",
+    }
+    diagnostic = result.stdout + result.stderr
+    if result.returncode != 1 or "pg_verifybackup: error:" not in diagnostic or expected[mode] not in diagnostic:
+        raise RuntimeError("Expected backup-integrity rejection was not observed: " + mode + "\n" + diagnostic)
 
 def utc():
     return dt.datetime.now(dt.timezone.utc).isoformat()
@@ -76,9 +93,9 @@ class Lab:
         name = self.project + "_" + role
         result = run(["docker", "volume", "inspect", name], check=False)
         if result.returncode:
-            if required:
-                raise RuntimeError("Required lab volume missing: " + name)
-            return None
+            if not required and "no such volume" in result.stderr.lower():
+                return None
+            raise RuntimeError("Cannot inspect required lab volume: " + name + "\n" + result.stderr)
         info = json.loads(result.stdout)[0]
         self.assert_labels(info.get("Labels") or {})
         if info["Labels"].get("com.docker.compose.volume") != role:
@@ -93,12 +110,23 @@ class Lab:
         self.assert_labels(info["Config"].get("Labels") or {})
         if info["Config"]["Labels"].get("com.docker.compose.service") != service:
             raise RuntimeError("Container service mismatch")
+        expected_mounts = {"db": {"primary": "/var/lib/postgresql/data", "repository": "/repository"},
+                           "recovery": {"recovery": "/var/lib/postgresql/data", "repository": "/repository"}}
+        if service not in expected_mounts:
+            raise RuntimeError("Unknown lab service")
+        seen = {}
         for mount in info["Mounts"]:
             if mount["Type"] == "volume":
                 names = {self.project + "_" + r: r for r in ("primary", "recovery", "repository")}
                 if mount["Name"] not in names:
                     raise RuntimeError("Foreign volume attached to lab container")
-                self.volume(names[mount["Name"]])
+                role = names[mount["Name"]]
+                if role in seen or expected_mounts[service].get(role) != mount["Destination"]:
+                    raise RuntimeError("Volume role or mount destination does not match lab service")
+                seen[role] = mount["Destination"]
+                self.volume(role)
+        if seen != expected_mounts[service]:
+            raise RuntimeError("Required lab volume mounts are missing")
         return ids[0]
 
     def sql(self, statement, service="db", check=True):
@@ -149,8 +177,11 @@ class Lab:
         return run([*args, IMAGE, "sh", "-ceu", script], check=check)
 
     def up(self):
-        for role in ("primary", "recovery", "repository"):
-            self.volume(role, required=False)
+        volumes = {role: self.volume(role, required=False) for role in ("primary", "recovery", "repository")}
+        if volumes["primary"] is None and volumes["repository"] is not None:
+            marker = self.tool("if [ -f /repository/cluster-id ]; then cat /repository/cluster-id; fi").stdout.strip()
+            if marker:
+                raise RuntimeError("Source volume is missing but its backup repository exists; use restore, not up")
         self.compose("create", "db")
         self.tool('mkdir -p /repository/backups /repository/wal /repository/failed; '
                   'if [ -f /repository/lab-id ]; then '
@@ -234,7 +265,7 @@ END $$;""", service)
 
     def backup_ids(self):
         value = self.tool('find /repository/backups -mindepth 1 -maxdepth 1 -type d -printf "%f\\n"').stdout
-        return sorted(x for x in value.splitlines() if re.fullmatch(BACKUP_PATTERN, x))
+        return sorted((x for x in value.splitlines() if re.fullmatch(BACKUP_PATTERN, x)), key=backup_sort_key)
 
     def backup_id(self, identifier=None):
         ids = self.backup_ids()
@@ -249,24 +280,28 @@ END $$;""", service)
 
     def backup(self):
         started = time.monotonic()
-        identifier = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ-") + secrets.token_hex(4)
+        identifier = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%S%fZ-") + secrets.token_hex(4)
         record = {"backup": identifier, "started_at": utc(), "status": "failed"}
         try:
             self.identity()
             self.volume("repository")
             temporary = "/repository/backups/.partial-" + identifier
-            command = ('umask 077; export PGPASSWORD="$(cat /run/secrets/db_password)"; '
+            command = ('umask 077; PGPASSWORD="$(cat /run/secrets/db_password)"; export PGPASSWORD; '
                        f"gosu postgres pg_basebackup -h 127.0.0.1 -U postgres -D {temporary} "
-                       "-Fp -X stream --checkpoint=fast --manifest-checksums=SHA256 "
-                       f"--label={identifier}; pg_verifybackup {temporary}; "
-                       f"mv {temporary} /repository/backups/{identifier}; sync -f /repository/backups")
+                       "-Fp -X stream --no-password --checkpoint=fast --manifest-checksums=SHA256 "
+                       f"--label={identifier}; pg_verifybackup {temporary}")
             result = run(["docker", "exec", "-u", "0", self.container("db"), "sh", "-ceu", command])
             record["basebackup_seconds"] = round(time.monotonic() - started, 3)
             record["verification"] = result.stdout.strip()
             self.archive()
+            # A failed archive barrier leaves an unselectable partial, not a latest backup.
+            self.tool(f"mv {temporary} /repository/backups/{identifier}; sync -f /repository/backups", writable=True)
             self.retain()
             record["status"] = "passed"
             return identifier
+        except Exception as error:
+            record["error"] = str(error)
+            raise
         finally:
             record["elapsed_seconds"] = round(time.monotonic() - started, 3)
             record["finished_at"] = utc()
@@ -311,7 +346,7 @@ done''', writable=True)
     def restore(self, identifier=None, target=None, base_only=False):
         identifier = self.backup_id(identifier)
         self.verify(identifier)
-        if target:
+        if target is not None:
             parsed = dt.datetime.fromisoformat(target)
             if parsed.tzinfo is None:
                 raise RuntimeError("PITR target must include a timezone")
@@ -449,6 +484,16 @@ chmod 700 /restore''', recovery=True)
             measured.update(last_archived_segment=barrier, source_volume_absent=True,
                             archived_batch_count=len(archived_commits))
             report["scenarios"].append(measured)
+            try:
+                self.up()
+            except RuntimeError as error:
+                if "Source volume is missing" not in str(error):
+                    raise
+            else:
+                raise RuntimeError("Startup recreated a lost source alongside its existing repository")
+            if self.volume("primary", required=False) is not None:
+                raise RuntimeError("Rejected startup still created a source volume")
+            report["checks"].append({"name": "missing-source-startup-refused", "status": "passed"})
 
             print("Exercise: accidental deletion and timestamp PITR", flush=True)
             self.clean()
@@ -481,6 +526,34 @@ chmod 700 /restore''', recovery=True)
             (self.log_dir / "pitr.log").write_text(logs)
             report["scenarios"].append(measured)
 
+            future = (dt.datetime.now(dt.timezone.utc) + dt.timedelta(days=1)).isoformat()
+            try:
+                self.restore(pitr_backup, target=future)
+            except RuntimeError as error:
+                if "recovery ended before configured recovery target was reached" not in str(error):
+                    raise
+                (self.log_dir / "unreachable-pitr.log").write_text(str(error))
+            else:
+                raise RuntimeError("An unreachable PITR target was incorrectly accepted")
+            report["checks"].append({"name": "unreachable-pitr-refused", "status": "passed"})
+
+            # Exercise the real archive script's duplicate/replacement contract on
+            # a synthetic, expendable segment; remove it before further recovery.
+            archive_probe = '''set -eu
+name=000000010000FFFF0000FFFF
+source=/repository/failed/archive-contract
+test ! -e /repository/wal/$name
+trap 'rm -f "$source" /repository/wal/$name' EXIT
+printf ORIGINAL > "$source"
+/bin/sh /lab/archive.sh "$source" "$name"
+/bin/sh /lab/archive.sh "$source" "$name"
+printf DIFFERENT > "$source"
+if /bin/sh /lab/archive.sh "$source" "$name"; then exit 9; fi
+test "$(cat /repository/wal/$name)" = ORIGINAL
+'''
+            run(["docker", "exec", "-u", "postgres", self.container("db"), "sh", "-ceu", archive_probe])
+            report["checks"].append({"name": "archive-idempotency-and-no-overwrite", "status": "passed"})
+
             print("Exercise: damaged and incomplete copies", flush=True)
             for mode in ("corrupt-data", "missing-data", "missing-wal"):
                 path = "/repository/failed/" + mode
@@ -495,22 +568,46 @@ chmod 700 /restore''', recovery=True)
                 result = self.tool(f"pg_verifybackup {path}", check=False)
                 diagnostic = result.stdout + result.stderr
                 (self.log_dir / (mode + ".log")).write_text(diagnostic)
-                if result.returncode == 0:
-                    raise RuntimeError("Damaged backup incorrectly accepted: " + mode)
+                require_verifier_rejection(mode, result)
                 report["checks"].append({"name": mode, "status": "passed",
                                          "verifier_exit_code": result.returncode, "diagnostic": diagnostic.strip()[-1200:]})
                 self.tool(f"rm -rf {path}", writable=True)
             self.verify(pitr_backup)
+
+            available = self.backup_ids()
+            # Only this controller fault is injected: pg_basebackup and
+            # pg_verifybackup still execute against the real running database.
+            with patch.object(self, "archive", side_effect=RuntimeError("Injected archive barrier outage")):
+                try:
+                    self.backup()
+                except RuntimeError as error:
+                    if "Injected archive barrier outage" not in str(error):
+                        raise
+                else:
+                    raise RuntimeError("Backup ignored an archive barrier failure")
+            if self.backup_ids() != available:
+                raise RuntimeError("Failed archive barrier published a selectable backup")
+            report["checks"].append({"name": "archive-barrier-failure-unpublished", "status": "passed",
+                                     "fault_injection": "Controller barrier outage after real physical backup and verification"})
 
             self.backup()
             self.backup()
             ids = self.backup_ids()
             if len(ids) != 2 or pitr_backup in ids:
                 raise RuntimeError("Retention did not keep exactly two full backups")
+            post_backup = self.seed()[-1]["id"]
+            self.archive()
             expected = self.snapshot()
-            self.restore(ids[0], base_only=True)
+            self.restore(ids[0])
             self.assert_snapshot(expected)
-            report["checks"].append({"name": "retention-and-oldest-restore", "status": "passed", "retained_full_backups": len(ids)})
+            label = self.tool(f"cat /repository/backups/{ids[0]}/backup_label").stdout
+            oldest_segment = re.search(r"\(file ([A-F0-9]{24})\)", label).group(1)
+            segments = self.tool('find /repository/wal -maxdepth 1 -name "00000001????????????????" -printf "%f\\n"').stdout.splitlines()
+            if any(segment < oldest_segment for segment in segments):
+                raise RuntimeError("Retention left expired WAL segments")
+            report["checks"].append({"name": "retention-and-oldest-restore", "status": "passed",
+                                     "retained_full_backups": len(ids), "post_backup_batch_replayed": post_backup,
+                                     "expired_wal_segments_removed": True})
 
             success = self.schedule_once()
             if success != 0:
@@ -533,9 +630,18 @@ chmod 700 /restore''', recovery=True)
             report["status"], report["error"] = "failed", str(error)
             raise
         finally:
-            report["finished_at"] = utc()
-            write_json(self.log_dir / "report.json", report)
-            print("Evidence: " + str((self.log_dir / "report.json").relative_to(ROOT)))
+            try:
+                self.clean()
+                report["checks"].append({"name": "resource-cleanup", "status": "passed"})
+            except Exception as cleanup_error:
+                report["status"] = "failed"
+                report["cleanup_error"] = str(cleanup_error)
+                report["checks"].append({"name": "resource-cleanup", "status": "failed"})
+                raise
+            finally:
+                report["finished_at"] = utc()
+                write_json(self.log_dir / "report.json", report)
+                print("Evidence: " + str(self.log_dir / "report.json"))
         return report
 
 def main():
@@ -551,6 +657,10 @@ def main():
     parser.add_argument("--interval", type=int, default=3600)
     parser.add_argument("--confirm-lab-only", action="store_true")
     args = parser.parse_args()
+    if args.target is not None and not args.target.strip():
+        parser.error("PITR target must not be empty; supply --target with an explicit timezone")
+    if args.target is not None and args.base_only:
+        parser.error("--target and --base-only cannot be combined")
     state = LOCAL / "runs" / (uuid.uuid4().hex + ".json") if args.command == "test" else args.state
     lab = Lab(state)
     if args.command == "schedule":
@@ -584,10 +694,7 @@ def main():
             print(lab.restore(args.backup, args.target, args.base_only))
             print(json.dumps(lab.snapshot("recovery"), indent=2))
         elif args.command == "test":
-            try:
-                print(json.dumps(lab.test(), indent=2))
-            finally:
-                lab.clean()
+            print(json.dumps(lab.test(), indent=2))
         elif args.command == "status":
             print(lab.compose("--profile", "recovery", "ps", "-a").stdout)
         elif args.command == "down":

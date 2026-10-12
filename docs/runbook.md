@@ -36,6 +36,9 @@ For a specific backup, or just the base-backup consistency point:
     python3 scripts/lab.py restore --backup 20261012T120000Z-0123abcd --base-only
 
 The example ID is illustrative; use an ID actually printed by make backup.
+New IDs include microseconds before Z; older IDs remain accepted. Failed backup
+barriers do not publish an ID for selection. An empty PITR target or combining
+--target with --base-only is rejected before creating or changing lab resources.
 
 ## Recover an accidental deletion
 

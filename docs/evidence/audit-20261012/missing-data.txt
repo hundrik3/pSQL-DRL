@@ -1,0 +1,1 @@
+pg_verifybackup: error: "global/pg_control" is present in the manifest but not on disk

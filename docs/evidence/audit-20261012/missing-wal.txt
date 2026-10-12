@@ -1,0 +1,2 @@
+pg_waldump: error: could not find any WAL file
+pg_verifybackup: error: WAL parsing failed for timeline 1
