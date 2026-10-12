@@ -1,0 +1,71 @@
+# All resource names are scoped by the controller's random Compose project.
+name: psqldrl
+x-labels: &labels
+  io.psqldrl.managed: "true"
+  io.psqldrl.instance: ${LAB_ID:?Use scripts/lab.py}
+x-image: &image postgres:17.11-bookworm@sha256:3645570cccdfa447589da9f57dd740faa29b30938e861289a5574b6ca6b03826
+services:
+  db:
+    image: *image
+    labels: *labels
+    environment:
+      POSTGRES_DB: shop
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+      POSTGRES_INITDB_ARGS: --data-checksums
+      LAB_ID: ${LAB_ID}
+    secrets: [db_password]
+    volumes:
+      - primary:/var/lib/postgresql/data
+      - repository:/repository
+      - ./postgres/init.sh:/docker-entrypoint-initdb.d/10-init.sh:ro
+      - ./postgres/schema.sql:/lab/schema.sql:ro
+      - ./postgres/archive.sh:/lab/archive.sh:ro
+    command:
+      - postgres
+      - -c
+      - wal_level=replica
+      - -c
+      - archive_mode=on
+      - -c
+      - archive_command=/bin/sh /lab/archive.sh %p %f
+      - -c
+      - archive_timeout=60s
+      - -c
+      - track_commit_timestamp=on
+      - -c
+      - max_wal_senders=5
+      - -c
+      - max_connections=30
+    networks: [lab]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U postgres -d shop"]
+      interval: 2s
+      timeout: 3s
+      retries: 60
+  recovery:
+    image: *image
+    profiles: [recovery]
+    labels: *labels
+    environment:
+      POSTGRES_DB: shop
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    secrets: [db_password]
+    volumes:
+      - recovery:/var/lib/postgresql/data
+      - repository:/repository:ro
+    command: [postgres, -c, archive_mode=off, -c, track_commit_timestamp=on]
+    networks: [lab]
+secrets:
+  db_password:
+    file: ./.local/db_password
+networks:
+  lab:
+    internal: true
+    labels: *labels
+volumes:
+  primary:
+    labels: *labels
+  recovery:
+    labels: *labels
+  repository:
+    labels: *labels

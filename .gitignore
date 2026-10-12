@@ -1,0 +1,9 @@
+.local/
+results/*
+!results/.gitkeep
+__pycache__/
+*.pyc
+.env
+*.dump
+*.sql.gz
+*.log
