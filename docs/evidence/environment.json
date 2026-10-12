@@ -1,0 +1,14 @@
+{
+  "python": "3.12.14",
+  "architecture": "x86_64",
+  "docker_engine": "28.4.0",
+  "compose": "2.40.3",
+  "implementation_sha256": {
+    "scripts/lab.py": "13ad10df30ca4b926ff5bedf30d0843ea31ea4d3b99f754864b35371271adec1",
+    "compose.yaml": "c412f8a6d3824e5e257ede85ab4fc84ed75e3978d769ee29bf2aab21ce51d1ee",
+    "postgres/schema.sql": "4639a4cee32033bee7fb0108b3883a7f08e016e662b20346a4ba7ccefc9c63b3",
+    "postgres/init.sh": "a50d9c090586d7815fa3de918e84d30e844bb2707bd204620107881d0951e8a5",
+    "postgres/archive.sh": "a6bd38a9f86496b3dfe72b1767ba0f2432e195f50acaf7d99471d9f7d394e61a"
+  },
+  "validation_note": "Local Docker host; small workload; other isolated lab checks ran concurrently. Not a production benchmark."
+}

@@ -1,0 +1,27 @@
+recovery-1  |
+recovery-1  | PostgreSQL Database directory appears to contain a database; Skipping initialization
+recovery-1  |
+recovery-1  | 2026-10-12 16:58:54.674 UTC [1] LOG:  starting PostgreSQL 17.11 (Debian 17.11-1.pgdg12+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+recovery-1  | 2026-10-12 16:58:54.674 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+recovery-1  | 2026-10-12 16:58:54.674 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+recovery-1  | 2026-10-12 16:58:54.675 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+recovery-1  | 2026-10-12 16:58:54.677 UTC [29] LOG:  database system was interrupted; last known up at 2026-10-12 16:58:20 UTC
+recovery-1  | 2026-10-12 16:58:55.154 UTC [29] LOG:  starting backup recovery with redo LSN 0/3000028, checkpoint LSN 0/3000080, on timeline ID 1
+recovery-1  | 2026-10-12 16:58:55.160 UTC [29] LOG:  restored log file "000000010000000000000003" from archive
+recovery-1  | 2026-10-12 16:58:55.173 UTC [29] LOG:  starting point-in-time recovery to 2026-10-12 16:58:36.182029+00
+recovery-1  | 2026-10-12 16:58:55.175 UTC [29] LOG:  redo starts at 0/3000028
+recovery-1  | 2026-10-12 16:58:55.183 UTC [29] LOG:  restored log file "000000010000000000000004" from archive
+recovery-1  | 2026-10-12 16:58:55.195 UTC [29] LOG:  restored log file "000000010000000000000005" from archive
+recovery-1  | 2026-10-12 16:58:55.203 UTC [29] LOG:  completed backup recovery with redo LSN 0/3000028 and end LSN 0/3000120
+recovery-1  | 2026-10-12 16:58:55.203 UTC [29] LOG:  consistent recovery state reached at 0/3000120
+recovery-1  | 2026-10-12 16:58:55.204 UTC [1] LOG:  database system is ready to accept read-only connections
+recovery-1  | 2026-10-12 16:58:55.205 UTC [29] LOG:  recovery stopping before commit of transaction 765, time 2026-10-12 16:58:36.478524+00
+recovery-1  | 2026-10-12 16:58:55.205 UTC [29] LOG:  redo done at 0/50567E0 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.02 s
+recovery-1  | 2026-10-12 16:58:55.205 UTC [29] LOG:  last completed transaction was at log time 2026-10-12 16:58:35.772324+00
+recovery-1  | cp: cannot stat '/repository/wal/00000002.history': No such file or directory
+recovery-1  | 2026-10-12 16:58:55.209 UTC [29] LOG:  selected new timeline ID: 2
+recovery-1  | cp: cannot stat '/repository/wal/00000001.history': No such file or directory
+recovery-1  | 2026-10-12 16:58:55.226 UTC [29] LOG:  archive recovery complete
+recovery-1  | 2026-10-12 16:58:55.226 UTC [27] LOG:  checkpoint starting: end-of-recovery immediate wait
+recovery-1  | 2026-10-12 16:58:55.237 UTC [27] LOG:  checkpoint complete: wrote 56 buffers (0.3%); 0 WAL file(s) added, 0 removed, 2 recycled; write=0.002 s, sync=0.007 s, total=0.012 s; sync files=23, longest=0.001 s, average=0.001 s; distance=33113 kB, estimate=33113 kB; lsn=0/50567E0, redo lsn=0/50567E0
+recovery-1  | 2026-10-12 16:58:55.242 UTC [1] LOG:  database system is ready to accept connections

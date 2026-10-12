@@ -607,4 +607,3 @@ if __name__ == "__main__":
     except (RuntimeError, subprocess.TimeoutExpired, ValueError) as error:
         print(str(error), file=sys.stderr)
         sys.exit(1)
-
